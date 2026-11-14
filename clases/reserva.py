@@ -5,6 +5,13 @@
 # Rama: feature/gestion-reservas
 # Fase 4 - Programacion 213023
 
+# Cambios del tercer commit - observaciones del tutor Alexander:
+# 1. Ya no uso ValueError, ahora uso mi excepcion propia ReservaIncorrectaError
+# 2. Agregue registro en archivo de logs, para que los errores y eventos queden guardados
+
+import logging
+import os
+
 # Estas excepciones son las que vamos a usar en reservas.
 # Las puse aqui para poder probar mi parte mientras Santiago
 # termina el archivo de excepciones del grupo.
@@ -19,23 +26,40 @@ class OperacionNoPermitidaError(Exception):
     pass
 
 
+# Configuracion sencilla del log, para que quede registro en logs/reservas.log
+# Si la carpeta logs no existe, la creo para que no falle
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+
+logging.basicConfig(
+    filename="logs/reservas.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+
 class Reserva:
     def __init__(self, id_reserva, cliente, servicio, duracion):
         # Validar que no falte el id
+        # Antes era ValueError, ahora es mi excepcion propia como pidio el tutor
         if id_reserva == "" or id_reserva is None:
-            raise ValueError("El id de la reserva es obligatorio")
+            logging.error("Intento de crear reserva sin id")
+            raise ReservaIncorrectaError("El id de la reserva es obligatorio")
 
         # Validar que si vengan cliente y servicio
         if cliente is None:
-            raise ValueError("La reserva necesita un cliente")
+            logging.error("Intento de crear reserva sin cliente")
+            raise ReservaIncorrectaError("La reserva necesita un cliente")
         if servicio is None:
-            raise ValueError("La reserva necesita un servicio")
+            logging.error("Intento de crear reserva sin servicio")
+            raise ReservaIncorrectaError("La reserva necesita un servicio")
 
         # Validar la duracion, debe ser un numero y mayor a 0
-        # Esto lo agregue en el segundo commit para que no falle si llega un texto
         if type(duracion) != int and type(duracion) != float:
+            logging.error("Duracion con tipo incorrecto: %s", duracion)
             raise ReservaIncorrectaError("La duracion debe ser un numero")
         if duracion <= 0:
+            logging.error("Duracion menor o igual a 0: %s", duracion)
             raise ReservaIncorrectaError("La duracion debe ser mayor a 0")
 
         self.id_reserva = id_reserva
@@ -43,26 +67,33 @@ class Reserva:
         self.servicio = servicio
         self.duracion = duracion
         self.estado = "pendiente"
+        logging.info("Reserva creada: %s", self.id_reserva)
 
     def confirmar(self):
         # Si el servicio no esta disponible no se puede confirmar
         if self.servicio.disponible == False:
+            logging.error("Reserva %s no se pudo confirmar, servicio no disponible", self.id_reserva)
             raise ServicioNoDisponibleError("El servicio no esta disponible")
 
         if self.estado == "confirmada":
+            logging.error("Reserva %s ya estaba confirmada", self.id_reserva)
             raise OperacionNoPermitidaError("La reserva ya esta confirmada")
 
         if self.estado == "cancelada":
+            logging.error("Reserva %s cancelada, no se puede confirmar", self.id_reserva)
             raise OperacionNoPermitidaError("No se puede confirmar una reserva cancelada")
 
         self.estado = "confirmada"
+        logging.info("Reserva confirmada: %s", self.id_reserva)
         print("Reserva confirmada:", self.id_reserva)
 
     def cancelar(self):
         if self.estado == "cancelada":
+            logging.error("Reserva %s ya estaba cancelada", self.id_reserva)
             raise OperacionNoPermitidaError("La reserva ya esta cancelada")
 
         self.estado = "cancelada"
+        logging.info("Reserva cancelada: %s", self.id_reserva)
         print("Reserva cancelada:", self.id_reserva)
 
     def procesar(self):
@@ -71,9 +102,13 @@ class Reserva:
             self.confirmar()
             costo = self.servicio.calcular_costo()
         except Exception as e:
+            # Aqui hago el registro dentro del except, como pidio el tutor
+            # Este es el manejo definitivo del error, por eso lo guardo en el log
+            logging.error("No se pudo procesar la reserva %s, error: %s", self.id_reserva, e)
             # Encadenamiento, guardo el error original
             raise ReservaIncorrectaError("No se pudo procesar la reserva") from e
         else:
+            logging.info("Reserva procesada: %s, costo: %s", self.id_reserva, costo)
             print("Reserva procesada, costo:", costo)
             return costo
         finally:
@@ -144,4 +179,15 @@ if __name__ == "__main__":
         reserva5 = Reserva("R05", cliente5, servicio5, "dos")
     except Exception as e:
         print("Error controlado:", e)
+
+    print("\n=== Prueba 6: reserva sin id ===")
+    try:
+        cliente6 = ClientePrueba("Pedro")
+        servicio6 = ServicioPrueba("Sala E")
+        reserva6 = Reserva("", cliente6, servicio6, 1)
+    except Exception as e:
+        print("Error controlado:", e)
+        print("Ahora es ReservaIncorrectaError, ya no es ValueError")
+
+    print("\nRevisa el archivo logs/reservas.log, ahi deben quedar guardados los eventos y errores")
 
