@@ -1,3 +1,4 @@
+
 # Tema 3: Gestion de Reservas
 # Autor: Luis Carlos Ortega Moreno
 # Usuario GitHub: luisk0411-design
@@ -30,7 +31,10 @@ class Reserva:
         if servicio is None:
             raise ValueError("La reserva necesita un servicio")
 
-        # Validar la duracion
+        # Validar la duracion, debe ser un numero y mayor a 0
+        # Esto lo agregue en el segundo commit para que no falle si llega un texto
+        if type(duracion) != int and type(duracion) != float:
+            raise ReservaIncorrectaError("La duracion debe ser un numero")
         if duracion <= 0:
             raise ReservaIncorrectaError("La duracion debe ser mayor a 0")
 
@@ -132,3 +136,12 @@ if __name__ == "__main__":
         reserva1.cancelar()
     except Exception as e:
         print("Error controlado:", e)
+
+    print("\n=== Prueba 5: duracion con texto ===")
+    try:
+        cliente5 = ClientePrueba("Maria")
+        servicio5 = ServicioPrueba("Sala D")
+        reserva5 = Reserva("R05", cliente5, servicio5, "dos")
+    except Exception as e:
+        print("Error controlado:", e)
+
