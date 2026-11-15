@@ -5,9 +5,9 @@
 # Rama: feature/gestion-reservas
 # Fase 4 - Programacion 213023
 
-# Cambios del tercer commit - observaciones del tutor Alexander:
-# 1. Ya no uso ValueError, ahora uso mi excepcion propia ReservaIncorrectaError
-# 2. Agregue registro en archivo de logs, para que los errores y eventos queden guardados
+# Correccion final segun observacion del tutor Alexander 14 nov:
+# Ya no queda ningun error generico, todo es con excepciones propias
+# Y ya queda el registro en logs/reservas.log
 
 import logging
 import os
@@ -27,7 +27,6 @@ class OperacionNoPermitidaError(Exception):
 
 
 # Configuracion sencilla del log, para que quede registro en logs/reservas.log
-# Si la carpeta logs no existe, la creo para que no falle
 if not os.path.exists("logs"):
     os.makedirs("logs")
 
@@ -41,12 +40,13 @@ logging.basicConfig(
 class Reserva:
     def __init__(self, id_reserva, cliente, servicio, duracion):
         # Validar que no falte el id
-        # Antes era ValueError, ahora es mi excepcion propia como pidio el tutor
+        # Ahora es ReservaIncorrectaError como pidio el tutor
         if id_reserva == "" or id_reserva is None:
             logging.error("Intento de crear reserva sin id")
             raise ReservaIncorrectaError("El id de la reserva es obligatorio")
 
         # Validar que si vengan cliente y servicio
+        # Ahora son ReservaIncorrectaError
         if cliente is None:
             logging.error("Intento de crear reserva sin cliente")
             raise ReservaIncorrectaError("La reserva necesita un cliente")
@@ -102,8 +102,7 @@ class Reserva:
             self.confirmar()
             costo = self.servicio.calcular_costo()
         except Exception as e:
-            # Aqui hago el registro dentro del except, como pidio el tutor
-            # Este es el manejo definitivo del error, por eso lo guardo en el log
+            # Registro dentro del except, este es el manejo definitivo del error
             logging.error("No se pudo procesar la reserva %s, error: %s", self.id_reserva, e)
             # Encadenamiento, guardo el error original
             raise ReservaIncorrectaError("No se pudo procesar la reserva") from e
@@ -187,7 +186,15 @@ if __name__ == "__main__":
         reserva6 = Reserva("", cliente6, servicio6, 1)
     except Exception as e:
         print("Error controlado:", e)
-        print("Ahora es ReservaIncorrectaError, ya no es ValueError")
+        print("Tipo de error:", type(e).__name__)
+
+    print("\n=== Prueba 7: reserva sin cliente ===")
+    try:
+        servicio7 = ServicioPrueba("Sala F")
+        reserva7 = Reserva("R07", None, servicio7, 1)
+    except Exception as e:
+        print("Error controlado:", e)
+        print("Tipo de error:", type(e).__name__)
 
     print("\nRevisa el archivo logs/reservas.log, ahi deben quedar guardados los eventos y errores")
 
