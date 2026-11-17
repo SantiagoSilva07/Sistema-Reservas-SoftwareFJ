@@ -1,20 +1,83 @@
-Arquitectura del Sistema
+ARQUITECTURA DEL SISTEMA
 
-Clases principales
+CLASE ABSTRACTA GENERAL
 
-- Entidad (abstracta)
-- Cliente
-- Servicio (abstracta)
-- ReservaSala
-- AlquilerEquipo
-- AsesoriaEspecializada
-- Reserva
+Entidad
+- id
+- nombre
+- mostrar_info()
 
-Componentes
+CLASE CLIENTE
 
-- Gestión de clientes
-- Gestión de servicios
-- Gestión de reservas
-- Manejo de excepciones
-- Registro de logs
-- Simulaciones
+Hereda de Entidad
+
+Atributos:
+- id
+- nombre
+- correo
+- telefono
+
+Validaciones:
+- nombre obligatorio
+- correo obligatorio
+- telefono obligatorio
+
+CLASE ABSTRACTA SERVICIO
+
+Atributos:
+- codigo
+- nombre
+- precio_base
+- disponible
+
+Metodos:
+- calcular_costo()
+- mostrar_info()
+
+SERVICIOS DERIVADOS
+
+ReservaSala
+- capacidad
+
+AlquilerEquipo
+- tipo_equipo
+
+AsesoriaEspecializada
+- especialidad
+
+CLASE RESERVA
+
+Atributos:
+- id_reserva
+- cliente
+- servicio
+- duracion
+- estado
+
+Metodos:
+- confirmar()
+- cancelar()
+- procesar()
+- mostrar_info()
+
+EXCEPCIONES
+
+- ClienteError
+- ClienteInvalidoError
+- ServicioError
+- ServicioNoDisponibleError
+- ServicioInvalidoError
+- ReservaError
+- ReservaIncorrectaError
+- OperacionNoPermitidaError
+
+LOGS
+
+- sistema.log
+
+SIMULACIONES
+
+- minimo 10 casos
+- validos
+- invalidos
+- sistema debe continuar funcionando
