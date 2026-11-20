@@ -1,65 +1,45 @@
-
 # Tema 3: Gestion de Reservas
 # Autor: Luis Carlos Ortega Moreno
 # Usuario GitHub: luisk0411-design
-# Rama: feature/gestion-reservas
+# Rama: feature/integracion-reservas
 # Fase 4 - Programacion 213023
 
-# Correccion final segun observacion del tutor Alexander 14 nov:
-# Ya no queda ningun error generico, todo es con excepciones propias
-# Y ya queda el registro en logs/reservas.log
+# Integracion con el grupo:
+# Ya no uso excepciones locales, uso las de excepciones/excepciones.py
+# Ya no uso mi log local, uso el logger de logs/registro.py
 
-import logging
 import os
+import sys
 
-# Estas excepciones son las que vamos a usar en reservas.
-# Las puse aqui para poder probar mi parte mientras Santiago
-# termina el archivo de excepciones del grupo.
+# Para que funcione cuando lo corro con python clases/reserva.py
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-class ReservaIncorrectaError(Exception):
-    pass
-
-class ServicioNoDisponibleError(Exception):
-    pass
-
-class OperacionNoPermitidaError(Exception):
-    pass
-
-
-# Configuracion sencilla del log, para que quede registro en logs/reservas.log
-if not os.path.exists("logs"):
-    os.makedirs("logs")
-
-logging.basicConfig(
-    filename="logs/reservas.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
+from excepciones.excepciones import ReservaIncorrectaError, ServicioNoDisponibleError, OperacionNoPermitidaError
+from logs.registro import logger
 
 class Reserva:
     def __init__(self, id_reserva, cliente, servicio, duracion):
         # Validar que no falte el id
         # Ahora es ReservaIncorrectaError como pidio el tutor
         if id_reserva == "" or id_reserva is None:
-            logging.error("Intento de crear reserva sin id")
+            logger.error("Intento de crear reserva sin id")
             raise ReservaIncorrectaError("El id de la reserva es obligatorio")
 
         # Validar que si vengan cliente y servicio
         # Ahora son ReservaIncorrectaError
         if cliente is None:
-            logging.error("Intento de crear reserva sin cliente")
+            logger.error("Intento de crear reserva sin cliente")
             raise ReservaIncorrectaError("La reserva necesita un cliente")
         if servicio is None:
-            logging.error("Intento de crear reserva sin servicio")
+            logger.error("Intento de crear reserva sin servicio")
             raise ReservaIncorrectaError("La reserva necesita un servicio")
 
         # Validar la duracion, debe ser un numero y mayor a 0
         if type(duracion) != int and type(duracion) != float:
-            logging.error("Duracion con tipo incorrecto: %s", duracion)
+            logger.error("Duracion con tipo incorrecto: %s", duracion)
             raise ReservaIncorrectaError("La duracion debe ser un numero")
         if duracion <= 0:
-            logging.error("Duracion menor o igual a 0: %s", duracion)
+            logger.error("Duracion menor o igual a 0: %s", duracion)
             raise ReservaIncorrectaError("La duracion debe ser mayor a 0")
 
         self.id_reserva = id_reserva
@@ -67,33 +47,33 @@ class Reserva:
         self.servicio = servicio
         self.duracion = duracion
         self.estado = "pendiente"
-        logging.info("Reserva creada: %s", self.id_reserva)
+        logger.info("Reserva creada: %s", self.id_reserva)
 
     def confirmar(self):
         # Si el servicio no esta disponible no se puede confirmar
         if self.servicio.disponible == False:
-            logging.error("Reserva %s no se pudo confirmar, servicio no disponible", self.id_reserva)
+            logger.error("Reserva %s no se pudo confirmar, servicio no disponible", self.id_reserva)
             raise ServicioNoDisponibleError("El servicio no esta disponible")
 
         if self.estado == "confirmada":
-            logging.error("Reserva %s ya estaba confirmada", self.id_reserva)
+            logger.error("Reserva %s ya estaba confirmada", self.id_reserva)
             raise OperacionNoPermitidaError("La reserva ya esta confirmada")
 
         if self.estado == "cancelada":
-            logging.error("Reserva %s cancelada, no se puede confirmar", self.id_reserva)
+            logger.error("Reserva %s cancelada, no se puede confirmar", self.id_reserva)
             raise OperacionNoPermitidaError("No se puede confirmar una reserva cancelada")
 
         self.estado = "confirmada"
-        logging.info("Reserva confirmada: %s", self.id_reserva)
+        logger.info("Reserva confirmada: %s", self.id_reserva)
         print("Reserva confirmada:", self.id_reserva)
 
     def cancelar(self):
         if self.estado == "cancelada":
-            logging.error("Reserva %s ya estaba cancelada", self.id_reserva)
+            logger.error("Reserva %s ya estaba cancelada", self.id_reserva)
             raise OperacionNoPermitidaError("La reserva ya esta cancelada")
 
         self.estado = "cancelada"
-        logging.info("Reserva cancelada: %s", self.id_reserva)
+        logger.info("Reserva cancelada: %s", self.id_reserva)
         print("Reserva cancelada:", self.id_reserva)
 
     def procesar(self):
@@ -103,11 +83,11 @@ class Reserva:
             costo = self.servicio.calcular_costo()
         except Exception as e:
             # Registro dentro del except, este es el manejo definitivo del error
-            logging.error("No se pudo procesar la reserva %s, error: %s", self.id_reserva, e)
+            logger.error("No se pudo procesar la reserva %s, error: %s", self.id_reserva, e)
             # Encadenamiento, guardo el error original
             raise ReservaIncorrectaError("No se pudo procesar la reserva") from e
         else:
-            logging.info("Reserva procesada: %s, costo: %s", self.id_reserva, costo)
+            logger.info("Reserva procesada: %s, costo: %s", self.id_reserva, costo)
             print("Reserva procesada, costo:", costo)
             return costo
         finally:
@@ -119,7 +99,6 @@ class Reserva:
         print("Servicio:", self.servicio.nombre)
         print("Duracion:", self.duracion)
         print("Estado:", self.estado)
-
 
 # Prueba rapida para ver si funciona mi parte
 if __name__ == "__main__":
@@ -196,5 +175,4 @@ if __name__ == "__main__":
         print("Error controlado:", e)
         print("Tipo de error:", type(e).__name__)
 
-    print("\nRevisa el archivo logs/reservas.log, ahi deben quedar guardados los eventos y errores")
-
+    print("\nRevisa el archivo logs/sistema.log, ahi deben quedar guardados los eventos y errores")
