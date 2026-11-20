@@ -80,7 +80,7 @@ class Reserva:
         # Aqui uso try, except, else y finally como pide la guia
         try:
             self.confirmar()
-            costo = self.servicio.calcular_costo()
+            costo = self.servicio.calcular_costo(self.duracion)
         except Exception as e:
             # Registro dentro del except, este es el manejo definitivo del error
             logger.error("No se pudo procesar la reserva %s, error: %s", self.id_reserva, e)
