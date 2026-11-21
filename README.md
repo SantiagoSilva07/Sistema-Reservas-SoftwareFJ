@@ -25,9 +25,6 @@ INTEGRANTES
 
 - Santiago David Silva Viloria
 - Luis Carlos Ortega Moreno
-- Pendiente de confirmación
-- Pendiente de confirmación
-- Pendiente de confirmación
 
 TECNOLOGÍAS UTILIZADAS
 
@@ -180,14 +177,19 @@ ESTADO ACTUAL
 
 ✅ Desarrollo e integración completados.
 
-🟡 Elaboración del informe final en proceso.
+✅ Documentación final elaborada.
 
-TEMAS PENDIENTES
+✅ Proyecto listo para entrega.
 
-- Elaboración del informe PDF.
-- Organización de evidencias del proyecto.
-- Conclusiones finales.
-- Referencias bibliográficas en formato APA.
+ESTADO DE ENTREGA
+
+✅ Código fuente completado.
+✅ Repositorio GitHub actualizado.
+✅ Pull Requests integrados.
+✅ Simulaciones implementadas.
+✅ Evidencias incorporadas.
+✅ Documentación final elaborada.
+✅ Proyecto listo para entrega.
 
 UNIVERSIDAD
 
