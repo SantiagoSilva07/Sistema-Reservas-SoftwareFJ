@@ -5,10 +5,18 @@ Servicios y Reservas Software FJ.
 """
 
 # ==========================
+# CLASE BASE DEL SISTEMA
+# ==========================
+
+class SistemaError(Exception):
+    """Clase base para todas las excepciones del sistema."""
+
+
+# ==========================
 # EXCEPCIONES DE CLIENTE
 # ==========================
 
-class ClienteError(Exception):
+class ClienteError(SistemaError):
     """Clase base para errores de cliente."""
 
 
@@ -20,7 +28,7 @@ class ClienteInvalidoError(ClienteError):
 # EXCEPCIONES DE SERVICIO
 # ==========================
 
-class ServicioError(Exception):
+class ServicioError(SistemaError):
     """Clase base para errores de servicio."""
 
 
@@ -36,7 +44,7 @@ class ServicioInvalidoError(ServicioError):
 # EXCEPCIONES DE RESERVA
 # ==========================
 
-class ReservaError(Exception):
+class ReservaError(SistemaError):
     """Clase base para errores de reserva."""
 
 
