@@ -86,14 +86,18 @@ Validaciones:
 
 EXCEPCIONES
 
-- ClienteError
-- ClienteInvalidoError
-- ServicioError
-- ServicioNoDisponibleError
-- ServicioInvalidoError
-- ReservaError
-- ReservaIncorrectaError
-- OperacionNoPermitidaError
+SistemaError
+│
+├── ClienteError
+│   └── ClienteInvalidoError
+│
+├── ServicioError
+│   ├── ServicioNoDisponibleError
+│   └── ServicioInvalidoError
+│
+└── ReservaError
+    ├── ReservaIncorrectaError
+    └── OperacionNoPermitidaError
 
 LOGS
 
@@ -136,8 +140,8 @@ Casos implementados:
 - reserva con duración inválida
 - servicio no disponible
 - doble cancelación
-- cálculo con descuento
-- cálculo con impuesto
+- cálculo con descuento e impuesto
+- gestión mediante listas de clientes, servicios y reservas
 
 Características:
 - manejo de excepciones personalizadas
